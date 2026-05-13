@@ -1,78 +1,150 @@
 @echo off
-color 0a
-title                                    Informe Completo de Laptop - V0.2
-echo.
-echo                             ====================================================
-echo                                 INFORME DETALLADO DE COMPONENTES Y BATERIA
-echo                                              BY POLLITO1337
-echo                             ====================================================
-timeout /t 5 >nul
+chcp 65001 >nul
+title POLLITO1337 SYSTEM ANALYZER
+color 0A
+mode con: cols=100 lines=35
+
+:: =========================================================
+:: VARIABLES
+:: =========================================================
+set "REPORT=%USERPROFILE%\Desktop\Informe_Laptop.txt"
+set "BATTERY=%USERPROFILE%\Desktop\battery_report.html"
+
+:: =========================================================
+:: INTRO MATRIX
+:: =========================================================
+:matrix
 cls
 echo.
+echo  ██▓███   ▒█████   ██▓     ██▓     ██▓▄▄▄█████▓ ▒█████
+echo ▓██░  ██▒▒██▒  ██▒▓██▒    ▓██▒    ▓██▒▓  ██▒ ▓▒▒██▒  ██▒
+echo ▓██░ ██▓▒▒██░  ██▒▒██░    ▒██░    ▒██▒▒ ▓██░ ▒░▒██░  ██▒
+echo ▒██▄█▓▒ ▒▒██   ██░▒██░    ▒██░    ░██░░ ▓██▓ ░ ▒██   ██░
+echo ▒██▒ ░  ░░ ████▓▒░░██████▒░██████▒░██░  ▒██▒ ░ ░ ████▓▒░
+echo ▒▓▒░ ░  ░░ ▒░▒░▒░ ░ ▒░▓  ░░ ▒░▓  ░░▓    ▒ ░░   ░ ▒░▒░▒░
+echo ░▒ ░       ░ ▒ ▒░ ░ ░ ▒  ░░ ░ ▒  ░ ▒ ░    ░      ░ ▒ ▒░
+echo ░░       ░ ░ ░ ▒    ░ ░     ░ ░    ▒ ░  ░      ░ ░ ░ ▒
+echo               ░ ░      ░  ░    ░  ░ ░               ░ ░
+echo.
+echo ===============================================================
+echo              ADVANCED SYSTEM ANALYZER v2.0
+echo ===============================================================
+echo.
+echo              INITIALIZING MODULES...
+echo.
 
-echo                                     =========================================
-echo                                           ABRIENDO CUENTA DE GITHUB
-echo                                            github.com/pollito1337
-echo                                     =========================================
+timeout /t 2 >nul
 
+:: =========================================================
+:: GITHUB
+:: =========================================================
+echo [+] OPENING GITHUB PROFILE...
 start https://github.com/pollito1337
+timeout /t 3 >nul
 
-timeout /t 5 >nul
+:: =========================================================
+:: BORRAR REPORTES ANTERIORES
+:: =========================================================
+if exist "%REPORT%" del "%REPORT%"
+if exist "%BATTERY%" del "%BATTERY%"
+
 cls
+echo.
+echo ===============================================================
+echo                 SYSTEM SCAN IN PROGRESS
+echo ===============================================================
+echo.
 
-:: Función para simular escritura
-set "delay=echo."
+:: =========================================================
+:: ESCANEO
+:: =========================================================
+call :progress "ANALYZING SYSTEM"
+systeminfo > "%REPORT%"
 
-echo [1/8] Cargando informacion general del sistema...
-timeout /t 1 >nul
-systeminfo > "%USERPROFILE%\Desktop\Informe_Laptop.txt"
+call :progress "SCANNING CPU"
+wmic cpu get name,numberofcores,numberoflogicalprocessors,maxclockspeed >> "%REPORT%"
 
-echo [2/8] Obteniendo datos del Procesador (CPU)...
-timeout /t 1 >nul
-wmic cpu get name, numberofcores, numberoflogicalprocessors, currentclocksspeed, maxclockspeed >> "%USERPROFILE%\Desktop\Informe_Laptop.txt"
+call :progress "CHECKING MEMORY"
+wmic memorychip get manufacturer,capacity,speed,partnumber >> "%REPORT%"
+echo. >> "%REPORT%"
+wmic computersystem get totalphysicalmemory >> "%REPORT%"
 
-echo [3/8] Analizando Memoria RAM...
-timeout /t 1 >nul
-wmic memorychip get manufacturer, capacity, speed, partnumber >> "%USERPROFILE%\Desktop\Informe_Laptop.txt"
-echo. >>  "%USERPROFILE%\Desktop\Informe_Laptop.txt"
-wmic computersystem get totalphysicalmemory >> "%USERPROFILE%\Desktop\Informe_Laptop.txt"
+call :progress "ANALYZING STORAGE"
+wmic diskdrive get model,size,status,mediatype >> "%REPORT%"
 
-echo [4/8] Revisando Discos (SSD/HDD)...
-timeout /t 1 >nul
-wmic diskdrive get model, size, status, mediatype >> "%USERPROFILE%\Desktop\Informe_Laptop.txt"
+call :progress "DETECTING GPU"
+wmic path win32_VideoController get name,adapterram,driverversion >> "%REPORT%"
 
-echo [5/8] Detectando Tarjeta Grafica...
-timeout /t 1 >nul
-wmic path win32_VideoController get name, adapterram, driverversion >> "%USERPROFILE%\Desktop\Informe_Laptop.txt"
+call :progress "READING MOTHERBOARD"
+wmic baseboard get manufacturer,product,version >> "%REPORT%"
 
-echo [6/8] Obteniendo informacion de la Placa Base...
-timeout /t 1 >nul
-wmic baseboard get product, manufacturer, version >> "%USERPROFILE%\Desktop\Informe_Laptop.txt"
+call :progress "CHECKING NETWORK"
+ipconfig /all >> "%REPORT%"
 
-echo [7/8] Revisando adaptadores de red...
-timeout /t 1 >nul
-ipconfig /all >> "%USERPROFILE%\Desktop\Informe_Laptop.txt"
+call :progress "GENERATING BATTERY REPORT"
+powercfg /batteryreport /output "%BATTERY%" >nul
 
-echo [8/8] Generando reporte detallado de bateria...
+:: =========================================================
+:: FINAL
+:: =========================================================
+cls
+color 0B
+
+echo.
+echo ===============================================================
+echo                    SCAN COMPLETED SUCCESSFULLY
+echo ===============================================================
+echo.
+echo   [✓] SYSTEM REPORT GENERATED
+echo   [✓] BATTERY REPORT GENERATED
+echo.
+echo ---------------------------------------------------------------
+echo   FILES LOCATION:
+echo ---------------------------------------------------------------
+echo.
+echo   %REPORT%
+echo   %BATTERY%
+echo.
+echo ===============================================================
+echo.
+
 timeout /t 2 >nul
-powercfg /batteryreport /output "%USERPROFILE%\Desktop\battery_report.html"
+
+echo [+] OPENING REPORTS...
+start "" "%REPORT%"
+start "" "%BATTERY%"
 
 echo.
-echo ==========================================
-echo     ¡Informe completado con exito!
-echo ==========================================
+echo ===============================================================
+echo                  ALL TASKS FINISHED
+echo ===============================================================
 echo.
-echo Se han creado los siguientes archivos en tu Escritorio:
-echo.
-echo ·Informe_Laptop.txt (Todos los componentes)
-echo ·baterry_report.html (salud completa de la bateria)
-echo.
-echo Abriendo archivos...
-timeout /t 2 >nul
 
-start "" "%USERPROFILE%\Desktop\Informe_Laptop.txt"
-start "" "%USERPROFILE%\Desktop\battery_report.html"
-
-echo.
-echo Listo. Puedes cerrar esta ventana.
 pause
+exit
+
+:: =========================================================
+:: BARRA ANIMADA
+:: =========================================================
+:progress
+cls
+echo.
+echo ===============================================================
+echo                  SYSTEM SCAN IN PROGRESS
+echo ===============================================================
+echo.
+echo   %~1
+echo.
+
+<nul set /p=   [
+timeout /t 1 >nul
+<nul set /p=■■■■■
+timeout /t 1 >nul
+<nul set /p=■■■■■
+timeout /t 1 >nul
+<nul set /p=■■■■■
+timeout /t 1 >nul
+echo ■■■■■] 100%%
+echo.
+
+exit /b
