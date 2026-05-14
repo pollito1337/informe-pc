@@ -1,4 +1,5 @@
 # informe pc
+<img width="799" height="592" alt="image" src="https://github.com/user-attachments/assets/06708c29-294b-4822-baff-692e8d46a365" />
 
 ¿Para que sirve? , te estaras preguntando, bueno te lo explico un poco por encima
 
